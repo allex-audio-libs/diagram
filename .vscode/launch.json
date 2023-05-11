@@ -1,0 +1,65 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Test Diagram",
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "windows": {
+          "program": "${env:APPDATA}/npm/node_modules/allextesting/commandline/allex-mocha",
+        },
+        "linux": {
+          "program": "${env:HOME}/lib/node_modules/allextesting/commandline/allex-mocha",
+        },
+        "args": ["test/test.diagram.js"]
+      },{
+        "type": "node",
+        "request": "launch",
+        "name": "Test CSV Diagram",
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "windows": {
+          "program": "${env:APPDATA}/npm/node_modules/allextesting/commandline/allex-mocha",
+        },
+        "linux": {
+          "program": "${env:HOME}/lib/node_modules/allextesting/commandline/allex-mocha",
+        },
+        "args": ["test/test.csvdiagram.js"]
+      },{
+        "type": "node",
+        "request": "launch",
+        "name": "Play Diagram",
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "windows": {
+          "program": "${env:APPDATA}/npm/node_modules/allex/run.js",
+        },
+        "linux": {
+          "program": "${env:HOME}/lib/node_modules/allex/run.js",
+        },
+        "args": ["scripts/playdescriptor", "test/diagrams/diagram3.json", "5"]
+      },{
+        "type": "node",
+        "request": "launch",
+        "name": "Play CSV",
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "windows": {
+          "program": "${env:APPDATA}/npm/node_modules/allex/run.js",
+        },
+        "linux": {
+          "program": "${env:HOME}/lib/node_modules/allex/run.js",
+        },
+        "args": ["scripts/playcsv", "test/diagrams/filteredsawdiagram.csv", "15"]
+      }    
+    ]
+}

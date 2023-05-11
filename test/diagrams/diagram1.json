@@ -1,0 +1,137 @@
+{
+    "blocks": [{
+        "name": "Clock",
+        "type": "Clock",
+        "options": {
+            "SampleRate": 44100
+        }
+    },{
+        "name": "FModulator",
+        "type": "SineGenerator",
+        "options": {
+            "FrequencyHz": 14
+        }
+    },{
+        "name": "Sine",
+        "type": "SineGenerator",
+        "options": {
+            "FrequencyHz": 1000                    
+        }
+    },{
+        "name": "AModulator",
+        "type": "SawGenerator",
+        "options": {
+            "FrequencyHz": 0.8
+        }
+    },{
+        "name": "Converter",
+        "type": "MinusOnePlusOneToZeroPlusOne"
+    },{
+        "name": "Negative",
+        "type": "Negative"
+    },{
+        "name": "Attn",
+        "type": "Multiplier",
+        "options": {
+            "Math2": 1e-8
+        }
+    },{
+        "name": "Speaker",
+        "type": "Speaker",
+        "options": {
+            "Channels": 1,
+            "SampleRate": 44100
+        }
+    }],
+    "links": [{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "FModulator",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "Sine",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "AModulator",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "FModulator",
+            "channel": "Samples"
+        },
+        "in": {
+            "name": "Sine",
+            "channel": "FrequencyHzModulation"
+        }
+    },{
+        "out": {
+            "name": "AModulator",
+            "channel": "Samples"
+        },
+        "in": {
+            "name": "Negative",
+            "channel": "Math"
+        }
+    },{
+        "out": {
+            "name": "Negative",
+            "channel": "Math"
+        },
+        "in": {
+            "name": "Converter",
+            "channel": "Math"
+        }
+    },{
+        "out": {
+            "name": "Converter",
+            "channel": "Math"
+        },
+        "in": {
+            "name": "Attn",
+            "channel": "Math1"
+        }
+    },{
+        "out": {
+            "name": "Attn",
+            "channel": "Math"
+        },
+        "in": {
+            "name": "FModulator",
+            "channel": "Volume"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "SampleRate"
+        },
+        "in": {
+            "name": "Speaker",
+            "channel": "SampleRate"
+        }
+    },{
+        "out": {
+            "name": "Sine",
+            "channel": "Samples"
+        },
+        "in": {
+            "name": "Speaker",
+            "channel": "Channel1"
+        }
+    }]
+}

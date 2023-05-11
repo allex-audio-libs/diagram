@@ -1,0 +1,74 @@
+{
+    "blocks": [{
+        "name": "Clock",
+        "type": "Clock",
+        "options": {
+            "SampleRate": 44100
+        }
+    },{
+        "name": "Modulator",
+        "type": "SineGenerator",
+        "options": {
+            "FrequencyHz": 1440,
+            "Volume": 1e-8
+        }
+    },{
+        "name": "Sine",
+        "type": "SineGenerator",
+        "options": {                    
+        }
+    },{
+        "name": "Speaker",
+        "type": "Speaker",
+        "options": {
+            "Channels": 1,
+            "SampleRate": 44100
+        }
+    }],
+    "links": [{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "Modulator",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "Sine",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Modulator",
+            "channel": "Samples"
+        },
+        "in": {
+            "name": "Sine",
+            "channel": "FrequencyHzModulation"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "SampleRate"
+        },
+        "in": {
+            "name": "Speaker",
+            "channel": "SampleRate"
+        }
+    },{
+        "out": {
+            "name": "Sine",
+            "channel": "Samples"
+        },
+        "in": {
+            "name": "Speaker",
+            "channel": "Samples"
+        }
+    }]
+}

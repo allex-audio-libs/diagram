@@ -1,0 +1,328 @@
+{
+    "blocks": [{
+        "name": "Clock",
+        "type": "Clock",
+        "options": {
+            "SampleRate": 44100
+        }
+    },{
+        "name": "FModulator1",
+        "type": "SineGenerator",
+        "options": {
+            "FrequencyHz": 14
+        }
+    },{
+        "name": "FModulator2",
+        "type": "SineGenerator",
+        "options": {
+            "FrequencyHz": 14
+        }
+    },{
+        "name": "Sine1",
+        "type": "SineGenerator",
+        "options": {
+            "FrequencyHz": 1000                    
+        }
+    },{
+        "name": "Sine2",
+        "type": "SineGenerator",
+        "options": {
+            "FrequencyHz": 500                    
+        }
+    },{
+        "name": "AModulator1",
+        "type": "SawGenerator",
+        "options": {
+            "FrequencyHz": 0.8
+        }
+    },{
+        "name": "AModulator2",
+        "type": "SawGenerator",
+        "options": {
+            "FrequencyHz": 0.8
+        }
+    },{
+        "name": "Converter1",
+        "type": "MinusOnePlusOneToZeroPlusOne"
+    },{
+        "name": "Converter2",
+        "type": "MinusOnePlusOneToZeroPlusOne"
+    },{
+        "name": "Negative",
+        "type": "Negative"
+    },{
+        "name": "Attn1",
+        "type": "Multiplier",
+        "options": {
+            "Math2": 1e-8
+        }
+    },{
+        "name": "Attn2",
+        "type": "Multiplier",
+        "options": {
+            "Math2": 1e-8
+        }
+    },{
+        "name": "OutAttn",
+        "type": "Divider",
+        "options": {
+            "Math2": 2
+        }
+    },{
+        "name": "Adder",
+        "type": "Adder",
+        "options": {
+        }
+    },{
+        "name": "Speaker",
+        "type": "Speaker",
+        "options": {
+            "Channels": 1,
+            "SampleRate": 44100
+        }
+    }],
+    "links": [{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "FModulator1",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "FModulator2",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "Sine1",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "Sine2",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "AModulator1",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "AModulator2",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "Converter1",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "Converter2",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "Negative",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "Attn1",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "Attn2",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "OutAttn",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "Adder",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
+            "name": "FModulator1",
+            "channel": "Samples"
+        },
+        "in": {
+            "name": "Sine1",
+            "channel": "FrequencyHzModulation"
+        }
+    },{
+        "out": {
+            "name": "FModulator2",
+            "channel": "Samples"
+        },
+        "in": {
+            "name": "Sine2",
+            "channel": "FrequencyHzModulation"
+        }
+    },{
+        "out": {
+            "name": "AModulator1",
+            "channel": "Samples"
+        },
+        "in": {
+            "name": "Negative",
+            "channel": "Math"
+        }
+    },{
+        "out": {
+            "name": "AModulator2",
+            "channel": "Samples"
+        },
+        "in": {
+            "name": "Converter2",
+            "channel": "Math"
+        }
+    },{
+        "out": {
+            "name": "Negative",
+            "channel": "Math"
+        },
+        "in": {
+            "name": "Converter1",
+            "channel": "Math"
+        }
+    },{
+        "out": {
+            "name": "Converter1",
+            "channel": "Math"
+        },
+        "in": {
+            "name": "Attn1",
+            "channel": "Math1"
+        }
+    },{
+        "out": {
+            "name": "Converter2",
+            "channel": "Math"
+        },
+        "in": {
+            "name": "Attn2",
+            "channel": "Math1"
+        }
+    },{
+        "out": {
+            "name": "Attn1",
+            "channel": "Math"
+        },
+        "in": {
+            "name": "FModulator1",
+            "channel": "Volume"
+        }
+    },{
+        "out": {
+            "name": "Attn2",
+            "channel": "Math"
+        },
+        "in": {
+            "name": "FModulator2",
+            "channel": "Volume"
+        }
+    },{
+        "out": {
+            "name": "Clock",
+            "channel": "SampleRate"
+        },
+        "in": {
+            "name": "Speaker",
+            "channel": "SampleRate"
+        }
+    },{
+        "out": {
+            "name": "Sine1",
+            "channel": "Samples"
+        },
+        "in": {
+            "name": "Adder",
+            "channel": "Math1"
+        }
+    },{
+        "out": {
+            "name": "Sine2",
+            "channel": "Samples"
+        },
+        "in": {
+            "name": "Adder",
+            "channel": "Math2"
+        }
+    },{
+        "out": {
+            "name": "Adder",
+            "channel": "Math"
+        },
+        "in": {
+            "name": "OutAttn",
+            "channel": "Math1"
+        }
+    },{
+        "out": {
+            "name": "OutAttn",
+            "channel": "Math"
+        },
+        "in": {
+            "name": "Speaker",
+            "channel": "Channel1"
+        }
+    }]
+}

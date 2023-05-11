@@ -1,0 +1,25 @@
+{
+  "name": "allex__audio_diagramlib",
+  "version": "1.0.0",
+  "description": "AllexJS lib that deals with Audio Diagrams",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/allex-audio-libs/diagram.git"
+  },
+  "keywords": [
+    "ecosystem:AllexJS",
+    "audio",
+    "diagram",
+    "lib"
+  ],
+  "author": "razgar <razgar02@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/allex-audio-libs/diagram/issues"
+  },
+  "homepage": "https://github.com/allex-audio-libs/diagram#readme"
+}
