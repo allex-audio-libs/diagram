@@ -3,18 +3,19 @@ function createDiagramLoadCsv (lib, Diagram) {
 
     var _LOADINGELEMENTS = 1;
     var _CREATINGLINKS = 2;
+    var _CREATINGENVIRONMENT = 3;
+    var loadingStages = [_LOADINGELEMENTS, _CREATINGLINKS, _CREATINGENVIRONMENT];
 
     function CsvLoader (diagram, options) {
         this.diagram = diagram;
         this.options = options||{};
-        this.mode = _LOADINGELEMENTS;
+        this.loadingStage = 0;
         this.processLiner = this.processLine.bind(this);
         this.linesProcessed = 0;
     }
     CsvLoader.prototype.destroy = function () {
         this.linesProcessed = null;
         this.processLiner = null;
-        this.mode = null;
         this.options = null;
         this.diagram = null;
     };
@@ -30,9 +31,11 @@ function createDiagramLoadCsv (lib, Diagram) {
             return;
         }
         line = line.trim();
-        if (!line || line.startsWith('//')) {
+        if (!line) {
             if (this.linesProcessed>0) {
-                this.mode = _CREATINGLINKS;
+                if (this.loadingStage < loadingStages.length-1) {
+                    this.loadingStage++;
+                }
             }
             return;
         }
@@ -40,11 +43,14 @@ function createDiagramLoadCsv (lib, Diagram) {
         this.linesProcessed++;
     };
     CsvLoader.prototype.procFunc = function () {
-        switch (this.mode) {
+        var currentmode = loadingStages[this.loadingStage];
+        switch (currentmode) {
             case _LOADINGELEMENTS:
                 return 'loadElement';
             case _CREATINGLINKS:
                 return 'createLink';
+            case _CREATINGENVIRONMENT:
+                return 'createEnvironment';
             default: 
                 return 'noOp';
         }
@@ -80,6 +86,22 @@ function createDiagramLoadCsv (lib, Diagram) {
             }
         });
     };
+    CsvLoader.prototype.createEnvironment = function (items) {
+        if (!(lib.isArray(items) && items.length>2)){
+            throw new lib.Error('INVALID_ENVIRONMENT_LINE', items.join(this.options.delimiter||'\t')+' must have 3 elements');
+        }
+        switch (items[0]) {
+            case 'in':
+                this.diagram.createInEnvironment(items[1], items[2]);
+                break;
+            case 'out':
+                this.diagram.createOutEnvironment(items[1], items[2]);
+                break;
+            default: 
+                throw new lib.Error('INVALID_ENVIRONMENT_LINE', items.join(this.options.delimiter||'\t')+' must have its first element equal to "in" or "out"');
+        }
+    };
+    CsvLoader.prototype.createInEnvironment
     CsvLoader.prototype.noOp = lib.dummyFunc;
 
     Diagram.prototype.loadcsv = function (csv, options) {

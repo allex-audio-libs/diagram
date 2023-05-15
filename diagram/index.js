@@ -54,6 +54,12 @@ function createDiagram (lib, blocklib, mylib) {
         }
         inb.attachToPreviousBlock(outb, linkdesc.out.channel, linkdesc.in.channel);
     };
+    Diagram.prototype.createInEnvironment = function (channelname, distribution) {
+
+    };
+    Diagram.prototype.createOutEnvironment = function (channelname, internalsource) {
+
+    };
 
     require('./loadcreator')(lib, Diagram, blocklib);
     require('./loadcsvcreator')(lib, Diagram);

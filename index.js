@@ -5,7 +5,7 @@ function creator(execlib, blocklib) {
     var mylib = {};
 
     require('./diagram')(lib, blocklib, mylib);
-    require('./component')(lib, blocklib, mylib);
+    //require('./component')(lib, blocklib, mylib);
 
     return mylib;
 }

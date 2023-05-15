@@ -21,6 +21,20 @@
       },{
         "type": "node",
         "request": "launch",
+        "name": "Test Component",
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "windows": {
+          "program": "${env:APPDATA}/npm/node_modules/allextesting/commandline/allex-mocha",
+        },
+        "linux": {
+          "program": "${env:HOME}/lib/node_modules/allextesting/commandline/allex-mocha",
+        },
+        "args": ["test/test.component.js"]
+      },{
+        "type": "node",
+        "request": "launch",
         "name": "Test CSV Diagram",
         "skipFiles": [
           "<node_internals>/**"
@@ -59,7 +73,7 @@
         "linux": {
           "program": "${env:HOME}/lib/node_modules/allex/run.js",
         },
-        "args": ["scripts/playcsv", "test/diagrams/filteredsawdiagram.csv", "15"]
+        "args": ["scripts/playcsv", "test/diagrams/component.csv", "15"]
       }    
     ]
 }
