@@ -1,4 +1,4 @@
-function createDiagram (lib, blocklib, mylib) {
+function createDiagram (lib, blocklib, bufferlib, mylib) {
     'use strict';
 
     function Diagram () {
@@ -54,15 +54,9 @@ function createDiagram (lib, blocklib, mylib) {
         }
         inb.attachToPreviousBlock(outb, linkdesc.out.channel, linkdesc.in.channel);
     };
-    Diagram.prototype.createInEnvironment = function (channelname, distribution) {
-
-    };
-    Diagram.prototype.createOutEnvironment = function (channelname, internalsource) {
-
-    };
 
     require('./loadcreator')(lib, Diagram, blocklib);
-    require('./loadcsvcreator')(lib, Diagram);
+    require('./loadcsvcreator')(lib, bufferlib, Diagram);
 
     mylib.Diagram = Diagram;
 }
