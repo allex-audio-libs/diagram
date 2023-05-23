@@ -56,8 +56,8 @@ function createDiagram (lib, blocklib, bufferlib, mylib) {
     };
 
     require('./loadcreator')(lib, Diagram, blocklib);
-    require('./loadcsvcreator')(lib, bufferlib, Diagram);
 
     mylib.Diagram = Diagram;
+    require('./loadcsvcreator')(lib, bufferlib, blocklib, mylib);
 }
 module.exports = createDiagram;

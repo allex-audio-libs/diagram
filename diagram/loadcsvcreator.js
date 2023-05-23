@@ -1,6 +1,7 @@
-function createDiagramLoadCsv (lib, bufferlib, Diagram) {
+function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
     'use strict';
 
+    var Diagram = mylib.Diagram;
     var _LOADINGELEMENTS = 1;
     var _CREATINGLINKS = 2;
     var _CREATINGENVIRONMENT = 3;
@@ -38,7 +39,7 @@ function createDiagramLoadCsv (lib, bufferlib, Diagram) {
     Distributions.prototype.destroy = function () {
         this.possiblyAdder = null;
         this.traverse(destroyer);
-        bufferlib.DynaBuffer.destroy.call(this);
+        bufferlib.DynaBuffer.prototype.destroy.call(this);
     };
     Distributions.prototype.addFromString = function (string) {
         var ret, _ret, split;
@@ -88,6 +89,7 @@ function createDiagramLoadCsv (lib, bufferlib, Diagram) {
     }
     CsvLoader.prototype.load = function (csv) {
         csv.split('\n').forEach(this.processLiner);
+        this.buildResult();
         this.destroy();
     };
     CsvLoader.prototype.processLine = function (line) {
@@ -181,10 +183,127 @@ function createDiagramLoadCsv (lib, bufferlib, Diagram) {
         if (this.neededOutChannels.indexOf(channelname) < 0) {
             this.neededOutChannels.push(channelname);
         }
-        if (this.neededInDistributions.get(channelname)) {
+        if (this.neededOutDistributions.get(channelname)) {
             throw new lib.Error('DUPLICATE_OUT_ENVIRONMENT', internalsource+' asks for an Out Environment that has already been defined.');
         }
-        this.neededInDistributions.add(channelname, new Distribution.fromString(internalsource));
+        this.neededOutDistributions.add(channelname, new Distribution.fromString(internalsource));
+    };
+    function inchannelmixiner (res, channel) {
+        res.push('blocklib.mixins.'+channel+'Listener');
+        return res;
+    }
+    function outchannelmixiner (res, channel) {
+        res.push('blocklib.mixins.'+channel+'Emitter');
+        return res;
+    }
+    function inputProducerForDiagram (name, channelname) {
+        var block = this.blocks.get(name);
+        if (!block) {
+            return lib.dummyFunc(); //can also console.warn
+        }
+        return block['on'+channelname+'Input'].bind(block);
+    }
+    function methodNameOf (channelname) {
+        return 'on'+channelname+'Input'
+    }
+    function indisttraverserbytarget (fieldsandmethods, channelname, bucket) {
+        var dist, methodname, name;
+        if (!(bucket && bucket.contents)) {
+            return;
+        }
+        dist = bucket.contents;
+        methodname = methodNameOf(channelname);
+        name = dist.towhom+dist.where+'Inputer';
+        fieldsandmethods.fields.push({
+            name: name,
+            initial: "inputProducerForDiagram.call(this, '"+dist.towhom+"', '"+dist.where+"')",
+            destruction: 'nullit'
+        });
+        fieldsandmethods.methods[methodname].lines.push('this.'+name+'(number)');
+    }
+    function indisttraverser (fieldsandmethods, value, channelname) {
+        var methodname;
+        if (!(value && lib.isFunction(value.traverse))) {
+            return;
+        }
+        methodname = methodNameOf(channelname);
+        if (!fieldsandmethods.methods[methodname]) {
+            fieldsandmethods.methods[methodname] = {
+                params: ['number'],
+                lines: []
+            };
+        }
+        value.traverse(indisttraverserbytarget.bind(null, fieldsandmethods, channelname));
+        fieldsandmethods = null;
+        channelname = null;
+    }
+    CsvLoader.prototype.buildResult = function () {
+        //here
+        //1. A Component class should be created that inherits from Diagram
+        //2. All the channels should be added (in ctor, addMethods, in dtor)
+        //3. An instance of this class should be created
+        //4. blocks and links from this should be transferred to the newly created instance
+        //5. The newly created instance should connect its in/out to the inner blocks
+        //6. THIS is the result of load
+        var mixins, classstr, klass, instance, initfields;
+        var methods;
+        var infields, _infields;
+        var outfields, _outfields;
+        mixins = this.neededInChannels.reduce(inchannelmixiner, []);
+        this.neededOutChannels.reduce(outchannelmixiner, mixins);
+
+        initfields = [
+            {
+                name: 'blocks',
+                initial: "blocks",
+                destruction: 'ignoreit'
+            },
+            {
+                name: 'links',
+                initial: "links",
+                destruction: 'ignoreit'
+            }
+        ];
+
+        methods = {};
+        /*
+        methods: {
+            onClockInput: {
+                params: ['number'],
+                lines: [
+                'this.NoiseClockInputer(number);',
+                'this.AModulator1ClockInputer(number);',
+                'this.SineClockInputer(number);',
+                ...
+                ]
+            }
+        }
+        */
+
+        infields = [];
+        _infields = infields;
+        this.neededInDistributions.traverse(indisttraverser.bind(null, {
+            methods: methods,
+            fields: _infields
+        }));
+        _infields = null;
+
+
+        classstr = blocklib.mixins.createClass({
+            name: 'Component',
+            base: 'Diagram',
+            ctorparams: ['blocks', 'links'],
+            mixins: mixins,
+            //fields: fields
+            fields: initfields.concat(infields),
+            methods: methods
+        });
+        eval ('klass = '+classstr);
+        instance = new klass(this.diagram.blocks, this.diagram.links);
+        this.diagram.blocks = null;
+        this.diagram.links = null;
+        //transfer of created blocks to newly created Diagram is over, my destroy will do nothing special
+        this.result = instance;
     };
     CsvLoader.prototype.noOp = lib.dummyFunc;
 

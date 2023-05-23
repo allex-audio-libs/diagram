@@ -1,6 +1,15 @@
 function createComponent (lib, blocklib, mylib) {
     'use strict';
 
+    var Base = mylib.Diagram;
+
+    function Component () {
+        Base.call(this);
+    }
+    lib.inherit(Component, Base);
+    Component.prototype.destroy = function () {
+
+    };
 
     mylib.Component = Component;
 }
