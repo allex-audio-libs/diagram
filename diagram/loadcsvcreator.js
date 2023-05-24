@@ -237,6 +237,9 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         fieldsandmethods = null;
         channelname = null;
     }
+    function outdisttraverser (ctorlines, value, channelname) {
+        ctorlines.push("this.attachToBlockOutput('"+channelname+"', '"+value.towhom+"', '"+value.where+"');");
+    }
     CsvLoader.prototype.buildResult = function () {
         //here
         //1. A Component class should be created that inherits from Diagram
@@ -248,7 +251,7 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         var mixins, classstr, klass, instance, initfields;
         var methods;
         var infields, _infields;
-        var outfields, _outfields;
+        var ctorlines, _ctorlines;
         mixins = this.neededInChannels.reduce(inchannelmixiner, []);
         this.neededOutChannels.reduce(outchannelmixiner, mixins);
 
@@ -288,17 +291,33 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         }));
         _infields = null;
 
+        ctorlines = [];
+        _ctorlines = ctorlines;
+        this.neededOutDistributions.traverse(outdisttraverser.bind(null, _ctorlines));
+        _ctorlines = null;
 
         classstr = blocklib.mixins.createClass({
             name: 'Component',
             base: 'Diagram',
-            ctorparams: ['blocks', 'links'],
+            ctor:{
+                params: ['blocks', 'links'],
+                lines: ctorlines,
+                debug: true
+            },
             mixins: mixins,
             //fields: fields
             fields: initfields.concat(infields),
             methods: methods
         });
         eval ('klass = '+classstr);
+        klass.prototype.attachToBlockOutput = function (mychannel, blockname, blockchannel) {
+            var outb;
+            outb = this.blocks.get(blockname);
+            if (!outb) {
+                return; //maybe warn?
+            }
+            this.attachToPreviousBlock(outb, blockchannel, mychannel);
+        };
         instance = new klass(this.diagram.blocks, this.diagram.links);
         this.diagram.blocks = null;
         this.diagram.links = null;
