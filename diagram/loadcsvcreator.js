@@ -88,9 +88,12 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         return str.trim();
     }
     CsvLoader.prototype.load = function (csv) {
+        var ret;
         csv.split('\n').forEach(this.processLiner);
         this.buildResult();
+        ret = this.result;
         this.destroy();
+        return ret;
     };
     CsvLoader.prototype.processLine = function (line) {
         if (!line) {
@@ -188,7 +191,7 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         }
         this.neededOutDistributions.add(channelname, new Distribution.fromString(internalsource));
     };
-    function inchannelmixiner (res, channel) {
+    function anychannelmixiner (res, channel) {
         res.push('blocklib.mixins.'+channel+'Listener');
         return res;
     }
@@ -252,7 +255,7 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         var methods;
         var infields, _infields;
         var ctorlines, _ctorlines;
-        mixins = this.neededInChannels.reduce(inchannelmixiner, []);
+        mixins = this.neededInChannels.reduce(anychannelmixiner, []);
         this.neededOutChannels.reduce(outchannelmixiner, mixins);
 
         initfields = [
@@ -291,6 +294,7 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         }));
         _infields = null;
 
+        this.neededOutChannels.reduce(anychannelmixiner, mixins);
         ctorlines = [];
         _ctorlines = ctorlines;
         this.neededOutDistributions.traverse(outdisttraverser.bind(null, _ctorlines));
@@ -298,7 +302,7 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
 
         classstr = blocklib.mixins.createClass({
             name: 'Component',
-            base: 'Diagram',
+            base: 'mylib.Component',
             ctor:{
                 params: ['blocks', 'links'],
                 lines: ctorlines,
@@ -328,7 +332,7 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
 
     Diagram.prototype.loadcsv = function (csv, options) {
         var l = new CsvLoader(this, options);
-        l.load(csv); //will auto-destruct eventually
+        return l.load(csv); //will auto-destruct eventually
     };
 }
 module.exports = createDiagramLoadCsv;

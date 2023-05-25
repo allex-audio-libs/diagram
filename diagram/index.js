@@ -24,8 +24,31 @@ function createDiagram (lib, blocklib, bufferlib, mylib) {
         this.links = [];
     };
 
+    function fileDescriptor (thingy) {
+        var sp;
+        if (!lib.isString(thingy)) {
+            return null;
+        }
+        if (thingy.indexOf(':')<0) {
+            return null;
+        }
+        return thingy.split(':').map(function (thingy) {return thingy.trim();});
+    }
+    function produceBlock (blockdesc) {
+        var fd = fileDescriptor(blockdesc.type);
+        if (fd) {
+            switch (fd[0]) {
+                case 'csvfile':
+                    return this.loadCsvFile(fd[1]);
+                default:
+                    throw new lib.Error('UNSUPPORTED_FILE_DESCRIPTOR', blockdesc.type+' is not a supported file descriptor');
+            }
+        }
+        return new blocklib[blockdesc.type]();
+    }
     Diagram.prototype.createBlock = function (blockdesc) {
-        var b = new blocklib[blockdesc.type]();
+        var b;
+        b = produceBlock.call(this, blockdesc);
         this.blocks.add(blockdesc.name, b);
         if (blockdesc.options) {
             lib.traverseShallow(blockdesc.options, optioner.bind(null, b));
@@ -59,5 +82,6 @@ function createDiagram (lib, blocklib, bufferlib, mylib) {
 
     mylib.Diagram = Diagram;
     require('./loadcsvcreator')(lib, bufferlib, blocklib, mylib);
+    require('./loadfilecreator')(lib, bufferlib, blocklib, mylib);
 }
 module.exports = createDiagram;

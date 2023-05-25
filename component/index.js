@@ -1,7 +1,7 @@
 function createComponent (lib, blocklib, mylib) {
     'use strict';
 
-    var Base = mylib.Diagram;
+    var Base = blocklib.Base;
 
     function Component () {
         Base.call(this);

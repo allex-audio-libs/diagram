@@ -74,6 +74,20 @@
           "program": "${env:HOME}/lib/node_modules/allex/run.js",
         },
         "args": ["scripts/playcsv", "test/diagrams/component.csv", "15"]
+      },{
+        "type": "node",
+        "request": "launch",
+        "name": "Play Scene",
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "windows": {
+          "program": "${env:APPDATA}/npm/node_modules/allex/run.js",
+        },
+        "linux": {
+          "program": "${env:HOME}/lib/node_modules/allex/run.js",
+        },
+        "args": ["scripts/playcsv", "test/diagrams/audioscene.csv", "15"]
       }    
     ]
 }
