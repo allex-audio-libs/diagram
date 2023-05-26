@@ -108,6 +108,9 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
             }
             return;
         }
+        if (line.indexOf('//') == 0) {
+            return;
+        }
         this[this.procFunc()](line.split(this.options.delimiter||'\t'));
         this.linesProcessed++;
     };
@@ -306,7 +309,7 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
             ctor:{
                 params: ['blocks', 'links'],
                 lines: ctorlines,
-                debug: true
+                debug: false
             },
             mixins: mixins,
             //fields: fields

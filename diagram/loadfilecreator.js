@@ -11,6 +11,7 @@ function createDiagramLoadFile (lib, bufferlib, blocklib, mylib) {
             var d = new Diagram();
             component = d.loadcsv(fs.readFileSync(filename).toString());
             d.destroy();
+            return component;
         } catch (e) {
             var a = process.cwd();
             console.error(e);

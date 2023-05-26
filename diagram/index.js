@@ -49,6 +49,10 @@ function createDiagram (lib, blocklib, bufferlib, mylib) {
     Diagram.prototype.createBlock = function (blockdesc) {
         var b;
         b = produceBlock.call(this, blockdesc);
+        if (!b) {
+            console.error(blockdesc);
+            throw new lib.Error('BLOCK_NOT_CREATED', 'Block could not be created');
+        }
         this.blocks.add(blockdesc.name, b);
         if (blockdesc.options) {
             lib.traverseShallow(blockdesc.options, optioner.bind(null, b));
@@ -69,11 +73,12 @@ function createDiagram (lib, blocklib, bufferlib, mylib) {
         var inb, outb;
         inb = this.blocks.get(linkdesc.in.name);
         if (!inb) {
-            return; //maybe warn?
+            console.error(linkdesc);
+            throw new lib.Error('NO_LINK_INNAME', 'in.name was not specified in the linkdescriptor');
         }
         outb = this.blocks.get(linkdesc.out.name);
         if (!outb) {
-            return; //maybe warn?
+            throw new lib.Error('NO_BLOCK_FOUND_FOR_LINKING', 'No block was found for '+linkdesc.out.name);
         }
         inb.attachToPreviousBlock(outb, linkdesc.out.channel, linkdesc.in.channel);
     };
