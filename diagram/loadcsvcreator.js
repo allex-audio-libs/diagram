@@ -195,10 +195,12 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         this.neededOutDistributions.add(channelname, new Distribution.fromString(internalsource));
     };
     function listenerchannelmixiner (res, channel) {
+        blocklib.mixins.requestChannelMixin(channel, false);
         res.push('blocklib.mixins.'+channel+'Listener');
         return res;
     }
     function emitterchannelmixiner (res, channel) {
+        blocklib.mixins.requestChannelMixin(channel, true);
         res.push({
             name: 'blocklib.mixins.'+channel+'Emitter',
             params: [0]
