@@ -194,12 +194,15 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         }
         this.neededOutDistributions.add(channelname, new Distribution.fromString(internalsource));
     };
-    function anychannelmixiner (res, channel) {
+    function listenerchannelmixiner (res, channel) {
         res.push('blocklib.mixins.'+channel+'Listener');
         return res;
     }
-    function outchannelmixiner (res, channel) {
-        res.push('blocklib.mixins.'+channel+'Emitter');
+    function emitterchannelmixiner (res, channel) {
+        res.push({
+            name: 'blocklib.mixins.'+channel+'Emitter',
+            params: [0]
+        });
         return res;
     }
     function inputProducerForDiagram (name, channelname) {
@@ -209,8 +212,11 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         }
         return block['on'+channelname+'Input'].bind(block);
     }
-    function methodNameOf (channelname) {
-        return 'on'+channelname+'Input'
+    function inputMethodNameOf (channelname) {
+        return 'on'+channelname+'Input';
+    }
+    function setMethodNameOf (channelname) {
+        return 'set'+channelname;
     }
     function indisttraverserbytarget (fieldsandmethods, channelname, bucket) {
         var dist, methodname, name;
@@ -218,7 +224,7 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
             return;
         }
         dist = bucket.contents;
-        methodname = methodNameOf(channelname);
+        methodname = inputMethodNameOf(channelname);
         name = dist.towhom+dist.where+'Inputer';
         fieldsandmethods.fields.push({
             name: name,
@@ -232,7 +238,25 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         if (!(value && lib.isFunction(value.traverse))) {
             return;
         }
-        methodname = methodNameOf(channelname);
+
+        /*
+            now fieldsandmethods.outdistributions have to be checked
+            if they don't have channelname,
+            we have to produce set+channelname method
+        */
+        if (!fieldsandmethods.outdistributions.get(channelname)) {
+            methodname = setMethodNameOf(channelname);
+            if (!fieldsandmethods.methods[methodname]) {
+                fieldsandmethods.methods[methodname] = {
+                    params: ['number'],
+                    lines: [
+                        'this.'+inputMethodNameOf(channelname)+'(number)'
+                    ]
+                };
+            }
+        }
+
+        methodname = inputMethodNameOf(channelname);
         if (!fieldsandmethods.methods[methodname]) {
             fieldsandmethods.methods[methodname] = {
                 params: ['number'],
@@ -244,7 +268,7 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         channelname = null;
     }
     function outdisttraverser (ctorlines, value, channelname) {
-        ctorlines.push("this.attachToBlockOutput('"+channelname+"', '"+value.towhom+"', '"+value.where+"');");
+        ctorlines.push("this.attachToBlockOutput('"+channelname+"', '"+value.towhom+"', '"+value.where+"')");
     }
     CsvLoader.prototype.buildResult = function () {
         //here
@@ -258,8 +282,9 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         var methods;
         var infields, _infields;
         var ctorlines, _ctorlines;
-        mixins = this.neededInChannels.reduce(anychannelmixiner, []);
-        this.neededOutChannels.reduce(outchannelmixiner, mixins);
+        mixins = this.neededInChannels.reduce(listenerchannelmixiner, []);
+        this.neededOutChannels.reduce(emitterchannelmixiner, mixins);
+        this.neededOutChannels.reduce(listenerchannelmixiner, mixins);
 
         initfields = [
             {
@@ -292,12 +317,12 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         infields = [];
         _infields = infields;
         this.neededInDistributions.traverse(indisttraverser.bind(null, {
+            outdistributions: this.neededOutDistributions,
             methods: methods,
             fields: _infields
         }));
         _infields = null;
 
-        this.neededOutChannels.reduce(anychannelmixiner, mixins);
         ctorlines = [];
         _ctorlines = ctorlines;
         this.neededOutDistributions.traverse(outdisttraverser.bind(null, _ctorlines));
