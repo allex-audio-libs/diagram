@@ -159,60 +159,66 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         });
     };
     CsvLoader.prototype.createEnvironment = function (items) {
-        if (!(lib.isArray(items) && items.length>2)){
-            throw new lib.Error('INVALID_ENVIRONMENT_LINE', items.join(this.options.delimiter||'\t')+' must have 3 elements');
+        if (!(lib.isArray(items) && items.length>3)){
+            throw new lib.Error('INVALID_ENVIRONMENT_LINE', items.join(this.options.delimiter||'\t')+' must have 4 elements');
         }
         switch (items[0]) {
             case 'in':
-                this.createInEnvironment(items[1], items[2]);
+                this.createInEnvironment(items[1], items[2], items[3]);
                 break;
             case 'out':
-                this.createOutEnvironment(items[1], items[2]);
+                this.createOutEnvironment(items[1], items[2], items[3]);
                 break;
             default: 
                 throw new lib.Error('INVALID_ENVIRONMENT_LINE', items.join(this.options.delimiter||'\t')+' must have its first element equal to "in" or "out"');
         }
     };
-    CsvLoader.prototype.createInEnvironment = function (channelname, distribution) {
+    var zeroString = String.fromCharCode(0);
+    CsvLoader.prototype.createInEnvironment = function (channeltype, channelname, distribution) {
         var dists;
-        if (this.neededInChannels.indexOf(channelname) < 0) {
-            this.neededInChannels.push(channelname);
+        var cht = channelname+zeroString+channeltype; //{name: channelname, type: channeltype}
+        if (this.neededInChannels.indexOf(cht) < 0) {
+            this.neededInChannels.push(cht);
         }
-        dists = this.neededInDistributions.get(channelname);
+        dists = this.neededInDistributions.get(cht);
         if (!dists) {
             dists = new Distributions();
-            this.neededInDistributions.add(channelname, dists);
+            this.neededInDistributions.add(cht, dists);
         }
         dists.addFromString(distribution);
     };
-    CsvLoader.prototype.createOutEnvironment = function (channelname, internalsource) {
-        if (this.neededOutChannels.indexOf(channelname) < 0) {
-            this.neededOutChannels.push(channelname);
+    CsvLoader.prototype.createOutEnvironment = function (channeltype, channelname, internalsource) {
+        var cht = channelname+zeroString+channeltype; //{name: channelname, type: channeltype}
+        if (this.neededOutChannels.indexOf(cht) < 0) {
+            this.neededOutChannels.push(cht);
         }
-        if (this.neededOutDistributions.get(channelname)) {
+        if (this.neededOutDistributions.get(cht)) {
             throw new lib.Error('DUPLICATE_OUT_ENVIRONMENT', internalsource+' asks for an Out Environment that has already been defined.');
         }
-        this.neededOutDistributions.add(channelname, new Distribution.fromString(internalsource));
+        this.neededOutDistributions.add(cht, new Distribution.fromString(internalsource));
     };
-    function listenerchannelmixiner (res, channel) {
-        blocklib.mixins.requestChannelMixin(channel, false);
-        res.push('blocklib.mixins.'+channel+'Listener');
+    function listenerchannelmixiner (res, cht) {
+        var nameandtype = cht.split(zeroString);
+        blocklib.mixins.requestChannelMixin(nameandtype[0], nameandtype[1], false);
+        res.push('blocklib.mixins.'+nameandtype[0]+'Listener');
         return res;
     }
-    function emitterchannelmixiner (res, channel) {
-        blocklib.mixins.requestChannelMixin(channel, true);
+    function emitterchannelmixiner (res, cht) {
+        var nameandtype = cht.split(zeroString);
+        blocklib.mixins.requestChannelMixin(nameandtype[0], nameandtype[1], true);
         res.push({
-            name: 'blocklib.mixins.'+channel+'Emitter',
+            name: 'blocklib.mixins.'+nameandtype[0]+'Emitter',
             params: [0]
         });
         return res;
     }
-    function inputProducerForDiagram (name, channelname) {
+    function inputProducerForDiagram (name, cht) {
+        var nameandtype = cht.split(zeroString);
         var block = this.blocks.get(name);
         if (!block) {
             return lib.dummyFunc(); //can also console.warn
         }
-        return block['on'+channelname+'Input'].bind(block);
+        return block['on'+nameandtype[0]+'Input'].bind(block);
     }
     function inputMethodNameOf (channelname) {
         return 'on'+channelname+'Input';
@@ -235,8 +241,10 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         });
         fieldsandmethods.methods[methodname].lines.push('this.'+name+'(number)');
     }
-    function indisttraverser (fieldsandmethods, value, channelname) {
+    function indisttraverser (fieldsandmethods, value, cht) {
         var methodname;
+        var nameandtype = cht.split(zeroString);
+        var channelname = nameandtype[0];
         if (!(value && lib.isFunction(value.traverse))) {
             return;
         }
@@ -269,7 +277,9 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         fieldsandmethods = null;
         channelname = null;
     }
-    function outdisttraverser (ctorlines, value, channelname) {
+    function outdisttraverser (ctorlines, value, cht) {
+        var nameandtype = cht.split(zeroString);
+        var channelname = nameandtype[0];
         ctorlines.push("this.attachToBlockOutput('"+channelname+"', '"+value.towhom+"', '"+value.where+"')");
     }
     CsvLoader.prototype.buildResult = function () {
