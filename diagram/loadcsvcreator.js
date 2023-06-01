@@ -267,6 +267,12 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         }
 
         methodname = inputMethodNameOf(channelname);
+        /*
+        var lines = [];
+        if (channelname.indexOf('Frequency')>=0) {
+            lines.push('debugger');
+        }
+        */
         if (!fieldsandmethods.methods[methodname]) {
             fieldsandmethods.methods[methodname] = {
                 params: ['number'],
