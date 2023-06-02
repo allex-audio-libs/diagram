@@ -127,6 +127,13 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
                 return 'noOp';
         }
     };
+    function optionValue (val) {
+        var ret = parseFloat(val);
+        if (isNaN(ret) && lib.isString(val) && val.length>0) {
+            return val;
+        }
+        return ret;
+    }
     CsvLoader.prototype.loadElement = function (items) {
         if (items.length<2) {
             throw new lib.Error('INVALID_ELEMENT_LINE', items.join(this.options.delimiter||'\t')+' must have at least 2 elements');
@@ -135,7 +142,7 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         var mylength = items.length - (items.length%2);
         var options = {};
         for (var i=2; i<mylength; i+=2) {
-            options[items[i]] = parseFloat(items[i+1]);
+            options[items[i]] = optionValue(items[i+1]);
         }
         this.diagram.createBlock({
             name: items[0],
