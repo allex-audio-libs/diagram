@@ -171,19 +171,19 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         }
         switch (items[0]) {
             case 'in':
-                this.createInEnvironment(items[1], items[2], items[3]);
+                this.createInEnvironment(items[1], items[2], items[3], items[4]);
                 break;
             case 'out':
-                this.createOutEnvironment(items[1], items[2], items[3]);
+                this.createOutEnvironment(items[1], items[2], items[3], items[4]);
                 break;
             default: 
                 throw new lib.Error('INVALID_ENVIRONMENT_LINE', items.join(this.options.delimiter||'\t')+' must have its first element equal to "in" or "out"');
         }
     };
     var zeroString = String.fromCharCode(0);
-    CsvLoader.prototype.createInEnvironment = function (channeltype, channelname, distribution) {
+    CsvLoader.prototype.createInEnvironment = function (channeltype, cbm, channelname, distribution) {
         var dists;
-        var cht = channelname+zeroString+channeltype; //{name: channelname, type: channeltype}
+        var cht = channelname+zeroString+channeltype+zeroString+cbm; //{name: channelname, type: channeltype}
         if (this.neededInChannels.indexOf(cht) < 0) {
             this.neededInChannels.push(cht);
         }
@@ -194,8 +194,8 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         }
         dists.addFromString(distribution);
     };
-    CsvLoader.prototype.createOutEnvironment = function (channeltype, channelname, internalsource) {
-        var cht = channelname+zeroString+channeltype; //{name: channelname, type: channeltype}
+    CsvLoader.prototype.createOutEnvironment = function (channeltype, cbm, channelname, internalsource) {
+        var cht = channelname+zeroString+channeltype+zeroString+cbm; //{name: channelname, type: channeltype}
         if (this.neededOutChannels.indexOf(cht) < 0) {
             this.neededOutChannels.push(cht);
         }
@@ -204,15 +204,35 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         }
         this.neededOutDistributions.add(cht, new Distribution.fromString(internalsource));
     };
+    function realCbmFrom(thingy) {
+        switch (thingy) {
+            case 'd':
+                return 'differential';
+            case 'a':
+                return 'allpass';
+            default:
+                throw new lib.Error('CBM_MARK_NOT_SUPPORTED', thingy+' is not a supported ChangeBehaviorModel mark');
+        }
+    }
     function listenerchannelmixiner (res, cht) {
         var nameandtype = cht.split(zeroString);
-        blocklib.mixins.requestChannelMixin(nameandtype[0], nameandtype[1], false);
+        blocklib.mixins.requestChannelMixin({
+            name: nameandtype[0], 
+            type: nameandtype[1],
+            cbm: realCbmFrom(nameandtype[2]),
+            emitter: false
+        });
         res.push('blocklib.mixins.'+nameandtype[0]+'Listener');
         return res;
     }
     function emitterchannelmixiner (res, cht) {
         var nameandtype = cht.split(zeroString);
-        blocklib.mixins.requestChannelMixin(nameandtype[0], nameandtype[1], true);
+        blocklib.mixins.requestChannelMixin({
+            name: nameandtype[0],
+            type: nameandtype[1], 
+            cbm: realCbmFrom(nameandtype[2]),
+            emitter: true
+        });
         res.push({
             name: 'blocklib.mixins.'+nameandtype[0]+'Emitter',
             params: [0]
