@@ -266,7 +266,11 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
             initial: "inputProducerForDiagram.call(this, '"+dist.towhom+"', '"+dist.where+"')",
             destruction: 'nullit'
         });
-        fieldsandmethods.methods[methodname].lines.push('this.'+name+'(number)');
+        fieldsandmethods.methods[methodname].lines.push(
+            'if (lib.isFunction(this.'+name+')) {',
+            '\tthis.'+name+'(number);',
+            '}'
+        );
     }
     function indisttraverser (fieldsandmethods, value, cht) {
         var methodname;
@@ -285,9 +289,9 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
             methodname = setMethodNameOf(channelname);
             if (!fieldsandmethods.methods[methodname]) {
                 fieldsandmethods.methods[methodname] = {
-                    params: ['number'],
+                    params: ['input'],
                     lines: [
-                        'this.'+inputMethodNameOf(channelname)+'(number)'
+                        'this.'+inputMethodNameOf(channelname)+'(input);'
                     ]
                 };
             }
@@ -313,7 +317,7 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
     function outdisttraverser (ctorlines, value, cht) {
         var nameandtype = cht.split(zeroString);
         var channelname = nameandtype[0];
-        ctorlines.push("this.attachToBlockOutput('"+channelname+"', '"+value.towhom+"', '"+value.where+"')");
+        ctorlines.push("this.attachToBlockOutput('"+channelname+"', '"+value.towhom+"', '"+value.where+"');");
     }
     CsvLoader.prototype.buildResult = function () {
         //here
@@ -376,13 +380,12 @@ function createDiagramLoadCsv (lib, bufferlib, blocklib, mylib) {
         classstr = blocklib.mixins.createClass({
             name: 'Component',
             base: 'mylib.Component',
-            ctor:{
+            ctor: {
                 params: ['blocks', 'links'],
                 lines: ctorlines,
                 debug: false
             },
             mixins: mixins,
-            //fields: fields
             fields: initfields.concat(infields),
             methods: methods
         });
