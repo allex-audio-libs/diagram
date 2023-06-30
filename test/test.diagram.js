@@ -80,6 +80,15 @@ var sinesineamod = {
         }
     },{
         out: {
+            name: 'Clock',
+            channel: 'Clock'
+        },
+        in: {
+            name: 'Speaker',
+            channel: 'Clock'
+        }
+    },{
+        out: {
             name: 'Modulator',
             channel: 'Samples'
         },
@@ -163,6 +172,15 @@ var sinesinefmod = {
         }
     },{
         out: {
+            name: 'Clock',
+            channel: 'Clock'
+        },
+        in: {
+            name: 'Speaker',
+            channel: 'Clock'
+        }
+    },{
+        out: {
             name: 'Modulator',
             channel: 'Samples'
         },
@@ -236,6 +254,15 @@ var sinesquareamod = {
         },
         in: {
             name: 'Sine',
+            channel: 'Clock'
+        }
+    },{
+        out: {
+            name: 'Clock',
+            channel: 'Clock'
+        },
+        in: {
+            name: 'Speaker',
             channel: 'Clock'
         }
     },{
@@ -323,6 +350,15 @@ var sinesquarefmod = {
         }
     },{
         out: {
+            name: 'Clock',
+            channel: 'Clock'
+        },
+        in: {
+            name: 'Speaker',
+            channel: 'Clock'
+        }
+    },{
+        out: {
             name: 'Modulator',
             channel: 'Samples'
         },
@@ -396,6 +432,15 @@ var sinesawamod = {
         },
         in: {
             name: 'Sine',
+            channel: 'Clock'
+        }
+    },{
+        out: {
+            name: 'Clock',
+            channel: 'Clock'
+        },
+        in: {
+            name: 'Speaker',
             channel: 'Clock'
         }
     },{
@@ -479,6 +524,15 @@ var sinesawfmod = {
         },
         in: {
             name: 'Sine',
+            channel: 'Clock'
+        }
+    },{
+        out: {
+            name: 'Clock',
+            channel: 'Clock'
+        },
+        in: {
+            name: 'Speaker',
             channel: 'Clock'
         }
     },{

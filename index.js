@@ -4,6 +4,7 @@ function creator(execlib, blocklib, bufferlib) {
     var lib = execlib.lib;
     var mylib = {};
 
+    require('./mixins')(lib, mylib);
     require('./diagram')(lib, blocklib, bufferlib, mylib);
     require('./component')(lib, blocklib, mylib);
 

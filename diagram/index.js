@@ -1,10 +1,17 @@
 function createDiagram (lib, blocklib, bufferlib, mylib) {
     'use strict';
 
+    var BlocksAndLinksMixin = mylib.mixins.BlocksAndLinks;
     function Diagram () {
+        BlocksAndLinksMixin.call(this);
         this.blocks = new lib.Map();
-        this.links = [];
+        this.links = [];        
     }
+    BlocksAndLinksMixin.addMethods(Diagram);
+    Diagram.prototype.destroy = function () {
+        BlocksAndLinksMixin.prototype.destroy.call(this);
+    }
+    /*
     Diagram.prototype.destroy = function () {
         this.purge();
         if (this.blocks) {
@@ -23,6 +30,7 @@ function createDiagram (lib, blocklib, bufferlib, mylib) {
         }
         this.links = [];
     };
+    */
 
     function fileDescriptor (thingy) {
         var sp;

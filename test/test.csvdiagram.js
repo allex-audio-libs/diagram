@@ -19,7 +19,9 @@ function unsuccessfulLoadingUnloadingIts (title, desc, exp) {
 
 function itsForLoadSuccessfully (title, desc, wait) {
     it('Load '+title+' Diagram', function () {
-        Diagram.loadcsv(desc);
+        var loadeddiagram = Diagram.loadcsv(desc);
+        Diagram.destroy();
+        Diagram = loadeddiagram;
         desc = null;
     });
     it('Wait for '+wait+' seconds', function () {
@@ -60,6 +62,7 @@ var mycsv = [
 "Clock	Clock	Attn2	Clock",
 "Clock	Clock	OutAttn	Clock",
 "Clock	Clock	Adder	Clock",
+"Clock	Clock	Speaker	Clock",
 "Clock	SampleRate	Speaker	SampleRate",
 "FModulator1	Samples	Sine1	FrequencyHzModulation",
 "FModulator2	Samples	Sine2	FrequencyHzModulation",
