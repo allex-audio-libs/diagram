@@ -59,7 +59,7 @@
         "linux": {
           "program": "${env:HOME}/lib/node_modules/allex/run.js",
         },
-        "args": ["scripts/playdescriptor", "test/diagrams/diagram3.json", "5"]
+        "args": ["scripts/playdescriptor", "test/diagrams/diagram1.json", "5"]
       },{
         "type": "node",
         "request": "launch",

@@ -72,6 +72,15 @@
         }
     },{
         "out": {
+            "name": "Clock",
+            "channel": "Clock"
+        },
+        "in": {
+            "name": "Speaker",
+            "channel": "Clock"
+        }
+    },{
+        "out": {
             "name": "FModulator",
             "channel": "Samples"
         },
