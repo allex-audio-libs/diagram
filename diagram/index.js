@@ -43,27 +43,46 @@ function createDiagram (lib, blocklib, bufferlib, mylib) {
         return thingy.split(':').map(function (thingy) {return thingy.trim();});
     }
     function produceBlock (blockdesc) {
-        var fd = fileDescriptor(blockdesc.type);
+        var fd = fileDescriptor(blockdesc.type), ctor;
         if (fd) {
             switch (fd[0]) {
                 case 'csvfile':
-                    return this.loadCsvFile(fd[1]);
+                    return {
+                        instance: this.loadCsvFile(fd[1]),
+                        optionsused: false
+                    };
                 default:
                     throw new lib.Error('UNSUPPORTED_FILE_DESCRIPTOR', blockdesc.type+' is not a supported file descriptor');
             }
         }
-        return new blocklib[blockdesc.type]();
+        ctor = blocklib[blockdesc.type];
+        if (ctor.length==0) {
+            return {
+                instance: new ctor(),
+                optionsused: false
+            };
+        }
+        if (ctor.length==1) {
+            return {
+                instance: new ctor(blockdesc.options),
+                optionsused: true
+            };
+        }
+        throw new lib.Error('UNSUPPORTED_BLOCK_CONSTRUCTOR', blockdesc.type+' does not have a supported constructor because it receives '+ctor.length+' parameters.');
     }
     Diagram.prototype.createBlock = function (blockdesc) {
-        var b;
-        b = produceBlock.call(this, blockdesc);
-        if (!b) {
+        var bp, b;
+        bp = produceBlock.call(this, blockdesc);
+        if (!(bp && bp.instance)) {
             console.error(blockdesc);
             throw new lib.Error('BLOCK_NOT_CREATED', 'Block could not be created');
         }
+        b = bp.instance;
         this.blocks.add(blockdesc.name, b);
-        if (blockdesc.options) {
-            lib.traverseShallow(blockdesc.options, optioner.bind(null, b));
+        if (!bp.optionsused) {
+            if (blockdesc.options) {
+                lib.traverseShallow(blockdesc.options, optioner.bind(null, b));
+            }
         }
         b = null;
     };

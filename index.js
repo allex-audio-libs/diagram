@@ -7,6 +7,7 @@ function creator(execlib, blocklib, bufferlib) {
     require('./mixins')(lib, mylib);
     require('./diagram')(lib, blocklib, bufferlib, mylib);
     require('./component')(lib, blocklib, mylib);
+    require('./polyphonercreator')(lib, blocklib, mylib);
 
     return mylib;
 }
