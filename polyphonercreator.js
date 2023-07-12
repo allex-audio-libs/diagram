@@ -4,6 +4,30 @@ function createPolyphoner (lib, blocklib, mylib) {
     var polychannelcount = blocklib.MidiInput.channelCount;
     var Diagram = mylib.Diagram;
 
+    function shallowReducer (reduceobj, val, key) {
+        reduceobj.seed = reduceobj.func(reduceobj.seed, val, key);
+    }
+    function reduceShallow (obj, func, seed) {
+        var reduceobj = {
+            func: func,
+            seed: seed
+        }, ret;
+        lib.traverseShallow(obj, shallowReducer.bind(null, reduceobj));
+        ret = reduceobj.seed;
+        reduceobj = null;
+        return ret;
+    }
+
+    function starReducer (res, val, key) {
+        if (!lib.isNonEmptyString(key)) {
+            return res;
+        }
+        if (key[0]!='*') {
+            return res;
+        }
+        return res+'	'+key.substring(1)+'	'+val;
+    }
+
     function Polyphoner (options) {
         var i, envstr1;
         //blocks
@@ -13,7 +37,7 @@ function createPolyphoner (lib, blocklib, mylib) {
         for (i=0; i<polychannelcount; i++) {
             mycsv.push(
                 'ADSR'+(i+1)+'	ADSRBase	A	'+options.A+'	D	'+options.D+'	S	'+options.S+'	R	'+options.R,
-                'Oscillator'+(i+1)+'	'+options.Type+'	FMFrequency	7	Frequency	122	Type	Square'
+                'Oscillator'+(i+1)+'	'+options.Type+reduceShallow(options, starReducer, '')
             );
         };
         for (i=1; i<polychannelcount; i++) {
@@ -22,7 +46,7 @@ function createPolyphoner (lib, blocklib, mylib) {
             );
         };
         mycsv.push(
-            'Divider	Divider	Math2	'+polychannelcount
+            'Multiplier	Multiplier	Math2	'+(lib.isNumber(options.Volume) ? options.Volume : 1)
         );
         mycsv.push(' ');
 
@@ -36,7 +60,7 @@ function createPolyphoner (lib, blocklib, mylib) {
             );
         }
         mycsv.push(
-            'Adder'+polychannelcount+'	Math	Divider	Math1',
+            'Adder'+polychannelcount+'	Math	Multiplier	Math1',
             'Oscillator1	Samples	Adder2	Math1',
             'Oscillator2	Samples	Adder2	Math2'
         );
@@ -50,7 +74,7 @@ function createPolyphoner (lib, blocklib, mylib) {
         mycsv.push(' ');
 
         //environment
-        envstr1 = 'in	number	d	Clock	Divider:Clock';
+        envstr1 = 'in	number	d	Clock	Multiplier:Clock';
         for (i=0; i<polychannelcount; i++) {
             if (i>-1/*0*/) {
                 envstr1+=',';
@@ -60,9 +84,10 @@ function createPolyphoner (lib, blocklib, mylib) {
                 envstr1+=',Adder'+(i+1)+':Clock';
             }
         }
-        mycsv.push(            
+        mycsv.push(  
+            'in	number	d	Volume	Multiplier:Math2',
             envstr1,
-            'out	number	a	Samples	Divider:Math'
+            'out	number	a	Samples	Multiplier:Math'
         );
         var dg = new Diagram();
         var ret = dg.loadcsv(mycsv.join('\n'));
